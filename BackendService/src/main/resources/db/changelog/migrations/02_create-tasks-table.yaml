@@ -1,0 +1,38 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2
+      author: Sweit2326
+      changes:
+        - createTable:
+            tableName: Tasks
+            columns:
+              - column:
+                  name: id
+                  type: INTEGER
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: content
+                  type: TEXT
+              - column:
+                  name: owner_id
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_tasks_users
+                    referencedTableName: Users
+                    referencedColumnNames: id
+                    deleteCascade: true
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+              - column:
+                  name: completed_at
+                  type: TIMESTAMP
