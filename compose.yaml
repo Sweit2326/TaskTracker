@@ -3,15 +3,17 @@ services:
     image: 'mariadb:12.3.3-ubi'
     ports:
       - '3306:3306'
+    env_file:
+      - .env
     environment:
-      MARIADB_DATABASE: tasktracker
-      MARIADB_PASSWORD: indev
-      MARIADB_ROOT_PASSWORD: indev
-      MARIADB_USER: indev
+      MARIADB_DATABASE: '${API_DB_NAME}'
+      MARIADB_PASSWORD: '${DB_PASSWORD}'
+      MARIADB_ROOT_PASSWORD: '${DB_ROOT_PASSWORD}'
+      MARIADB_USER: '${DB_USER}'
     volumes:
       - mariadb_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD-SHELL", "mariadb-admin ping -h localhost -uindev -pindev"]
+      test: ["CMD-SHELL", "mariadb-admin ping -h ${DB_HOST} -u${DB_USER} -p${DB_PASSWORD}"]
       interval: 10s
       timeout: 5s
       retries: 3
