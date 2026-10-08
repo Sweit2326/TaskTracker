@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: 3
+      author: Sweit2326
+      changes:
+        - renameColumn:
+            tableName: Users
+            oldColumnName: username
+            newColumnName: email
