@@ -1,5 +1,6 @@
 package dev.mironov.backendservice.security;
 
+import dev.mironov.backendservice.service.JwtService;
 import dev.mironov.backendservice.service.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -15,12 +16,14 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final UserDetailsServiceImpl userDetailsService;
+    private final JwtService jwtService;
 //    private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
 //    private final RestAccessDeniedHandler restAccessDeniedHandler;
 
@@ -41,8 +44,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
-        http
-                .authorizeHttpRequests(auth -> auth
+        return http.authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/user", "/auth/login", "/auth/logout").permitAll()
                         .requestMatchers(HttpMethod.GET, "/user").authenticated()
                         .anyRequest().permitAll())
@@ -55,7 +57,10 @@ public class SecurityConfig {
 //                        .accessDeniedHandler(restAccessDeniedHandler)
 //                )
                 .logout(logout -> logout.disable())
-                .csrf(csrf -> csrf.disable());
-        return http.build();
+                .csrf(csrf -> csrf.disable())
+                .addFilterBefore(
+                        new JwtAuthenticationFilter(userDetailsService, jwtService),
+                        UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 }
