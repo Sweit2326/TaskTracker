@@ -6,7 +6,9 @@ import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import dev.mironov.backendservice.exception.InvalidJwtTokenException;
+import dev.mironov.backendservice.exception.JwtInfrastructureException;
 import dev.mironov.backendservice.security.JwtProperties;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.Date;
 
+@Slf4j
 @Service
 @EnableConfigurationProperties(JwtProperties.class)
 public class JwtService {
@@ -25,7 +28,7 @@ public class JwtService {
         this.secretBytes = props.secretKey().getBytes(StandardCharsets.UTF_8);
 
         if (secretBytes.length < 32)
-            throw new IllegalStateException("JWT secret must be at least 32 bytes long");
+            throw new JwtInfrastructureException("JWT secret must be at least 32 bytes long");
     }
 
     public String generateToken(String email) {
@@ -44,7 +47,7 @@ public class JwtService {
 
             return signedJWT.serialize();
         } catch (JOSEException e) {
-            throw new IllegalStateException("Failed to sign JWT", e);
+            throw new JwtInfrastructureException("Failed to sign JWT", e);
         }
     }
 
@@ -66,7 +69,7 @@ public class JwtService {
 
             return email;
         } catch (JOSEException | ParseException e) {
-            throw new InvalidJwtTokenException("Invalid JWT token", e);
+            throw new JwtInfrastructureException("Internal Server Error", e);
         }
     }
 }
