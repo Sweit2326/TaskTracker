@@ -1,6 +1,7 @@
 package dev.mironov.backendservice.security;
 
-import dev.mironov.backendservice.service.JwtService;
+import dev.mironov.backendservice.security.handler.RestAccessDeniedHandler;
+import dev.mironov.backendservice.security.handler.RestAuthenticationEntryPoint;
 import dev.mironov.backendservice.service.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -23,9 +24,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final UserDetailsServiceImpl userDetailsService;
-    private final JwtService jwtService;
-//    private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
-//    private final RestAccessDeniedHandler restAccessDeniedHandler;
+    private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+    private final RestAccessDeniedHandler restAccessDeniedHandler;
+    private final JwtAuthenticationFilter jwtFilter;
 
     @Bean
     public AuthenticationProvider authenticationProvider(){
@@ -52,15 +53,13 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authenticationProvider(authenticationProvider())
-//                .exceptionHandling(ex -> ex
-//                        .authenticationEntryPoint(restAuthenticationEntryPoint)
-//                        .accessDeniedHandler(restAccessDeniedHandler)
-//                )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(restAuthenticationEntryPoint)
+                        .accessDeniedHandler(restAccessDeniedHandler)
+                )
                 .logout(logout -> logout.disable())
                 .csrf(csrf -> csrf.disable())
-                .addFilterBefore(
-                        new JwtAuthenticationFilter(userDetailsService, jwtService),
-                        UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 }
