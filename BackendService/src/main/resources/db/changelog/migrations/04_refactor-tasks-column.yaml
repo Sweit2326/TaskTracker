@@ -6,6 +6,7 @@ databaseChangeLog:
         - addNotNullConstraint:
             columnName: status
             tableName: Tasks
+            columnDataType: VARCHAR(50)
         - addDefaultValue:
             columnName: status
             tableName: Tasks
