@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: 4
+      author: Sweit2326
+      changes:
+        - addNotNullConstraint:
+            columnName: status
+            tableName: Tasks
+        - addDefaultValue:
+            columnName: status
+            tableName: Tasks
+            defaultValue: "PENDING"
