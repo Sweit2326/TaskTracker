@@ -1,6 +1,6 @@
 package dev.mironov.backendservice.record;
 
 public record UserResponse(
-        Long id,
+        Integer id,
         String email
 ) {}

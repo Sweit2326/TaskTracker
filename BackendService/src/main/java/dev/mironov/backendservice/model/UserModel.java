@@ -11,7 +11,7 @@ public class UserModel {
     @Id
     @Getter
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @Getter
     @Column(nullable = false, length = 255, unique = true)

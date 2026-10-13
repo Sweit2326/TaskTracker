@@ -10,11 +10,11 @@ import java.util.List;
 
 public class UserDetailsImpl implements UserDetails {
     @Getter
-    private final Long id;
+    private final Integer id;
     private final String email;
     private final String password;
 
-    public UserDetailsImpl(Long id, String email, String password) {
+    public UserDetailsImpl(Integer id, String email, String password) {
         this.id = id;
         this.email = email;
         this.password = password;
