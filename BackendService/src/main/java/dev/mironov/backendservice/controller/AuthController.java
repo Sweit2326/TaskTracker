@@ -26,7 +26,7 @@ public class AuthController {
     private final AuthenticationManager authManager;
 
     @PostMapping("/auth/login")
-    public ResponseEntity<?> login(@Valid @RequestBody AccessRequest req, HttpServletRequest httpReq, HttpServletResponse httpResp) {
+    public ResponseEntity<?> login(@Valid @RequestBody AccessRequest req) {
         Authentication auth = authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(req.email(), req.password()));
         String token = jwtService.generateToken(auth.getName());
@@ -38,9 +38,9 @@ public class AuthController {
     }
 
     @PostMapping("/user")
-    public ResponseEntity<?> register(@Valid @RequestBody AccessRequest req, HttpServletRequest httpReq, HttpServletResponse httpResp) {
+    public ResponseEntity<?> register(@Valid @RequestBody AccessRequest req) {
         regService.registerUser(req);
-        return login(req, httpReq, httpResp);
+        return login(req);
     }
 
     // эндпоинт для фронта
