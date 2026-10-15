@@ -46,9 +46,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         return http.authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/user", "/auth/login", "/auth/logout").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/user").authenticated()
-                        .anyRequest().permitAll())
+                        .requestMatchers(HttpMethod.POST, "/api/user", "/api/auth/login", "/api/auth/logout").permitAll()
+                        .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
