@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
 public record AccessRequest(
         @NotEmpty(message = "Email cannot be empty!")
         @Pattern(regexp = "\\S+", message = "Spaces not allowed")
-        @Size(max = 256, message = "Email is too long, maximum is 255 symbols")
+        @Size(max = 255, message = "Email is too long, maximum is 255 symbols")
         @Email(message = "Incorrect email format")
         String email,
         @NotEmpty(message = "Password cannot be empty!")
