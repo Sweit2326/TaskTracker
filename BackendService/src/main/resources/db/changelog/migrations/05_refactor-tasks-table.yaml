@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: 5
+      author: Sweit2326
+      changes:
+        - addColumn:
+            tableName: Tasks
+            columns:
+              - column:
+                  name: UUID
+                  type: UUID
+                  constraints:
+                    nullable: false
