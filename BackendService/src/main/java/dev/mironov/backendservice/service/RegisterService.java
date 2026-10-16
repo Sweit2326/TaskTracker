@@ -1,27 +1,39 @@
 package dev.mironov.backendservice.service;
 
+import dev.mironov.backendservice.exception.UserNotFoundException;
+import dev.mironov.backendservice.kafka.UserEventPublisher;
 import dev.mironov.backendservice.exception.EmailAlreadyTakenException;
 import dev.mironov.backendservice.model.UserModel;
 import dev.mironov.backendservice.record.AccessRequest;
 import dev.mironov.backendservice.repository.UserRepository;
+import dev.mironov.event.UserRegisteredEvent;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.Instant;
 
 @Service
 @RequiredArgsConstructor
 public class RegisterService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserEventPublisher eventPublisher;
 
     @Transactional
     public void registerUser(AccessRequest req) {
         if (userRepository.existsByEmail(req.email())) {
             throw new EmailAlreadyTakenException();
         } else {
-            UserModel user = userRepository.save(new UserModel(req.email(), passwordEncoder.encode(req.password())));
-            // TODO: kafka-event to send register email
+            userRepository.save(new UserModel(req.email(), passwordEncoder.encode(req.password())));
         }
+    }
+
+    public void sendRegisterEmail(String email) {
+        UserModel user = userRepository.findUserByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("Cannot send register message (Email: "+email+")"));
+        UserRegisteredEvent event = new UserRegisteredEvent(user.getId(), user.getEmail(), Instant.now());
+        eventPublisher.sendUserRegistered(event);
     }
 }
