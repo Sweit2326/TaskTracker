@@ -10,6 +10,7 @@
 
     <modules>
         <module>BackendService</module>
+        <module>CoreService</module>
     </modules>
 
     <properties>
@@ -37,11 +38,11 @@
                 <version>10.10</version>
                 <scope>compile</scope>
             </dependency>
-<!--            <dependency>-->
-<!--                <groupId>dev.mironov</groupId>-->
-<!--                <artifactId>CoreService</artifactId>-->
-<!--                <version>${project.version}</version>-->
-<!--            </dependency>-->
+            <dependency>
+                <groupId>dev.mironov</groupId>
+                <artifactId>CoreService</artifactId>
+                <version>${project.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
