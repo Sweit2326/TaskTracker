@@ -3,8 +3,6 @@ package dev.mironov.backendservice.controller;
 import dev.mironov.backendservice.record.AccessRequest;
 import dev.mironov.backendservice.service.JwtService;
 import dev.mironov.backendservice.service.RegisterService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -40,6 +38,7 @@ public class AuthController {
     @PostMapping("/user")
     public ResponseEntity<?> register(@Valid @RequestBody AccessRequest req) {
         regService.registerUser(req);
+        regService.sendRegisterEmail(req.email());
         return login(req);
     }
 
