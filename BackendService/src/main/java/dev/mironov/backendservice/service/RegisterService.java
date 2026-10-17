@@ -6,7 +6,7 @@ import dev.mironov.backendservice.exception.EmailAlreadyTakenException;
 import dev.mironov.backendservice.model.UserModel;
 import dev.mironov.backendservice.record.AccessRequest;
 import dev.mironov.backendservice.repository.UserRepository;
-import dev.mironov.event.UserRegisteredEvent;
+import dev.mironov.event.EmailSentEvent;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,7 +33,12 @@ public class RegisterService {
     public void sendRegisterEmail(String email) {
         UserModel user = userRepository.findUserByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("Cannot send register message (Email: "+email+")"));
-        UserRegisteredEvent event = new UserRegisteredEvent(user.getId(), user.getEmail(), Instant.now());
-        eventPublisher.sendUserRegistered(event);
+        EmailSentEvent event = new EmailSentEvent(
+                user.getId(),
+                user.getEmail(),
+                "Welcome to TaskTracker, User#"+user.getId(),
+                "We are happy that you're registered!",
+                Instant.now());
+        eventPublisher.sendRegisterEvent(event);
     }
 }
