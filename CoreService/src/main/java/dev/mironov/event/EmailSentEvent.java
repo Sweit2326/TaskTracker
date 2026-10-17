@@ -2,8 +2,10 @@ package dev.mironov.event;
 
 import java.time.Instant;
 
-public record UserRegisteredEvent(
+public record EmailSentEvent(
         Integer eventId,
-        String payload,
+        String email,
+        String title,
+        String content,
         Instant timestamp
 ) {}
