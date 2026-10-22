@@ -1,7 +1,6 @@
 package dev.mironov.backendservice.service;
 
 import dev.mironov.backendservice.exception.UserNotFoundException;
-import dev.mironov.backendservice.kafka.UserEventPublisher;
 import dev.mironov.backendservice.exception.EmailAlreadyTakenException;
 import dev.mironov.backendservice.model.UserModel;
 import dev.mironov.backendservice.record.AccessRequest;
@@ -19,7 +18,7 @@ import java.time.Instant;
 public class RegisterService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final UserEventPublisher eventPublisher;
+    private final OutboxService outboxService;
 
     @Transactional
     public void registerUser(AccessRequest req) {
@@ -39,6 +38,6 @@ public class RegisterService {
                 "Welcome to TaskTracker, User#"+user.getId(),
                 "We are happy that you're registered!",
                 Instant.now());
-        eventPublisher.sendRegisterEvent(event);
+        outboxService.create(event, "user-registered", "RegisterService");
     }
 }
