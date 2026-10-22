@@ -1,7 +1,9 @@
 package dev.mironov.backendservice.kafka;
 
+import dev.mironov.backendservice.exception.KafkaInfrastructureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.common.errors.TimeoutException;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
@@ -12,15 +14,19 @@ import java.util.concurrent.ExecutionException;
 @Component
 @RequiredArgsConstructor
 public class GenericKafkaProducer {
-    // TODO: KafkaTemplate configuration (maybe in props/config class)
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
     public void sendEvent(Message<?> message) {
         try {
             kafkaTemplate.send(message).get();
-        } catch (ExecutionException | InterruptedException e) {
-            log.error("Failed to send event: " + e.getMessage());
-            // TODO: exception-handling
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+        // TODO: refactor exception handling & add statuses(retry, dead, suspended)
+            if (e instanceof InterruptedException) {
+                Thread.currentThread().interrupt();
+                throw new KafkaInfrastructureException("Thread was interrupted", e);
+            } else {
+                throw new KafkaInfrastructureException("Failed to process event", e);
+            }
         }
     }
 }
