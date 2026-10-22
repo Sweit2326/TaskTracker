@@ -1,0 +1,30 @@
+databaseChangeLog:
+  - changeSet:
+      id: 6
+      author: Sweit2326
+      changes:
+        - createTable:
+            tableName: Outbox
+            columns:
+              - column:
+                  name: id
+                  type: INTEGER
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: payload
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: event_type
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: source
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
