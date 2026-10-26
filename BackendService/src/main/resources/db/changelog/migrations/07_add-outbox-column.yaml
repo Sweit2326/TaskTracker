@@ -1,0 +1,35 @@
+databaseChangeLog:
+  - changeSet:
+      id: 7
+      author: Sweit2326
+      changes:
+        - addColumn:
+            tableName: Outbox
+            columns:
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+                  defaultValue: "PENDING"
+              - column:
+                  name: attempts_count
+                  type: INTEGER
+              - column:
+                  name: next_attempt_at
+                  type: TIMESTAMP
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: processing_until
+                  type: TIMESTAMP
+              - column:
+                  name: last_error_code
+                  type: VARCHAR(50)
+              - column:
+                  name: last_error_message
+                  type: MEDIUMTEXT
+
