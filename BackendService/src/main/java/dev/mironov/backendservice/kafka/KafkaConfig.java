@@ -22,13 +22,15 @@ public class KafkaConfig {
         config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092,localhost:9094,localhost:9096");
         config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, JacksonJsonSerializer.class);
         config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JacksonJsonSerializer.class);
-        config.put(ProducerConfig.ACKS_CONFIG, "all");
-        config.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, "120000");
-        config.put(ProducerConfig.LINGER_MS_CONFIG, "5");
-        config.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, "30000");
-        config.put(ProducerConfig.RETRIES_CONFIG, Integer.MAX_VALUE);
-        config.put(ProducerConfig.RETRY_BACKOFF_MS_CONFIG, "100");
         config.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
+        config.put(ProducerConfig.ACKS_CONFIG, "all");
+
+        config.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, "20000");
+        config.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, "2000");
+        config.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, "5000");
+        config.put(ProducerConfig.RETRY_BACKOFF_MS_CONFIG, "1000");
+        config.put(ProducerConfig.LINGER_MS_CONFIG, "5");
+        config.put(ProducerConfig.RETRIES_CONFIG, Integer.MAX_VALUE);
 
         return new DefaultKafkaProducerFactory<>(config);
     }
@@ -40,7 +42,7 @@ public class KafkaConfig {
 
     // TODO: Перенести создание топика в email-sender-service
     @Bean
-    NewTopic createEmailSendingTopic() {
+    NewTopic createEmailTopic() {
         return TopicBuilder.name("EMAIL_SENDING_TASKS")
                 .partitions(3)
                 .replicas(3)
