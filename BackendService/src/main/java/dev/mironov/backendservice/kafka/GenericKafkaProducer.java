@@ -19,7 +19,7 @@ public class GenericKafkaProducer {
             kafkaTemplate.send(message).get();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            // TODO ...
+            log.warn("KafkaProducer thread was interrupted while sending message, shutting down...");
         }
     }
 }
