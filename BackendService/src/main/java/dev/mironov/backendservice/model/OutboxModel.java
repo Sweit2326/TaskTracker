@@ -3,7 +3,6 @@ package dev.mironov.backendservice.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -51,9 +50,9 @@ public class OutboxModel {
     @Column(name = "processing_until", nullable = false)
     private Instant processingUntil;
 
-    @Size(max = 50)
     @Column(name = "last_error_code", length = 50)
-    private String lastErrorCode;
+    @Enumerated(EnumType.STRING)
+    private ErrorCode lastErrorCode;
 
     @Lob
     @Column(name = "last_error_message")
@@ -68,22 +67,49 @@ public class OutboxModel {
     }
 
     public void setProcessing() {
-        this.status = Status.PROCESSING;
-        this.createdAt = Instant.now();
-        this.processingUntil = Instant.now().plusSeconds(15);
+        if (status == Status.RETRY && nextAttemptAt.isBefore(Instant.now())) {
+            nextAttemptAt = null;
+        } else if (nextAttemptAt != null && nextAttemptAt.isAfter(Instant.now())) return;
+
+        status = Status.PROCESSING;
+        createdAt = Instant.now();
+        processingUntil = Instant.now().plusSeconds(15);
     }
 
     public void setSent() {
-        this.status = Status.SENT;
-        this.createdAt = Instant.now();
-        this.processingUntil = null;
+        status = Status.SENT;
+        createdAt = Instant.now();
+        processingUntil = null;
     }
 
-    // TODO retry status setter
-    public void setRetry() {
-        this.status = Status.RETRY;
-        this.createdAt = Instant.now();
-        this.processingUntil = null;
+    public void setRetry(ErrorCode code, String message) {
+        createdAt = Instant.now();
+        processingUntil = null;
+        lastErrorCode = code;
+        lastErrorMessage = message;
+
+        attemptsCount = (attemptsCount == null) ? 1 : attemptsCount+1;
+
+        if (attemptsCount < 4) {
+            status = Status.RETRY;
+            nextAttemptAt = Instant.now().plusSeconds(20L *attemptsCount);
+        } else status = Status.DEAD;
+    }
+
+    public void setBlocked(ErrorCode code, String message) {
+        status = Status.BLOCKED;
+        createdAt = Instant.now();
+        processingUntil = null;
+        lastErrorCode = code;
+        lastErrorMessage = message;
+    }
+
+    public void setDead(ErrorCode code, String message) {
+        status = Status.DEAD;
+        createdAt = Instant.now();
+        processingUntil = null;
+        lastErrorCode = code;
+        lastErrorMessage = message;
     }
 
     public enum Status {
@@ -111,7 +137,6 @@ public class OutboxModel {
         MESSAGE_TOO_LARGE,
         JSON_SERIALIZATION_ERROR,
         // UNKNOWN:
-        KAFKA_PRODUCER_CLOSED,
         UNKNOWN_PROCESSING_FAILURE
     }
 }
