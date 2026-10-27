@@ -30,7 +30,7 @@ public class KafkaConfig {
         config.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, "5000");
         config.put(ProducerConfig.RETRY_BACKOFF_MS_CONFIG, "1000");
         config.put(ProducerConfig.LINGER_MS_CONFIG, "5");
-        config.put(ProducerConfig.RETRIES_CONFIG, Integer.MAX_VALUE);
+        config.put(ProducerConfig.RETRIES_CONFIG, 5);
 
         return new DefaultKafkaProducerFactory<>(config);
     }
