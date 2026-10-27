@@ -12,6 +12,6 @@ public class OutboxScheduler {
 
     @Scheduled(fixedDelay = 10_000)
     public void run() {
-        outboxService.processAll();
+        outboxService.processAll(outboxService.processBatch());
     }
 }
