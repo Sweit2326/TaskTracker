@@ -9,5 +9,5 @@ import java.util.List;
 
 public interface OutboxRepository extends JpaRepository<OutboxModel, Integer> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    List<OutboxModel> findTop10ByStatus(OutboxModel.Status status);
+    List<OutboxModel> findTop10ByStatusOrStatus(OutboxModel.Status status, OutboxModel.Status status1);
 }
