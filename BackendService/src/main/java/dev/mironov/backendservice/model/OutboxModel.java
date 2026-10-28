@@ -5,15 +5,18 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
 
+@Slf4j
 @Entity
 @Table(name = "Outbox")
 @NoArgsConstructor
 public class OutboxModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Getter
     private Integer id;
 
     @Getter
@@ -102,6 +105,7 @@ public class OutboxModel {
         processingUntil = null;
         lastErrorCode = code;
         lastErrorMessage = message;
+        log.error("[ALERT]: New BLOCKED message: {}", id);
     }
 
     public void setDead(ErrorCode code, String message) {
