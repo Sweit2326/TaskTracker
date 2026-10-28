@@ -18,6 +18,8 @@ import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.exc.InvalidDefinitionException;
 
 import javax.net.ssl.SSLHandshakeException;
+import java.time.Instant;
+import java.util.concurrent.ExecutionException;
 import java.util.List;
 
 @Slf4j
@@ -28,6 +30,31 @@ public class OutboxService {
     private final ObjectMapper objectMapper;
     private final OutboxRepository outboxRepository;
     private final GenericKafkaProducer kafkaProducer;
+
+    public void checkDeadLimitExceed(int limit) {
+        if (outboxRepository.countAllByStatus(OutboxModel.Status.DEAD) >= limit)
+            log.error("[ALERT]: DEAD messages limit exceed {}", limit);
+    }
+
+    public void checkRetryLimitExceed(int limit) {
+        if (outboxRepository.countAllByStatus(OutboxModel.Status.RETRY) >= limit)
+            log.error("[ALERT]: RETRY messages limit exceed {}", limit);
+    }
+
+    public void processStuckProcessingTasks() {
+        List<OutboxModel> stucked = outboxRepository.findAllByProcessingUntilBefore(Instant.now());
+        for (OutboxModel model : stucked) {
+            model.setRetry(OutboxModel.ErrorCode.UNKNOWN_PROCESSING_FAILURE, "Unknown error happened: message stuck while processing");
+        }
+    }
+
+    public void purgeExpiredTasks() {
+        int deadRows, sentRows;
+        do {
+            deadRows = outboxRepository.deleteAllExpiredByStatus(OutboxModel.Status.DEAD, 900, 10);
+            sentRows = outboxRepository.deleteAllExpiredByStatus(OutboxModel.Status.SENT, 900, 10);
+        } while ((deadRows & sentRows) == 0);
+    }
 
     @Transactional
     public <T extends KafkaEvent> void create(T payload, String eventType, String source) {
@@ -60,7 +87,10 @@ public class OutboxService {
 
             model.setSent();
             outboxRepository.save(model);
-        } catch (Exception e) {
+        } catch (ExecutionException e) {
+            if (isRetriable(e)) {
+                log.warn("Temporally kafka error happened while sending message: {}", model.getId());
+            } else log.error("Fatal kafka error happened while sending message: {}", model.getId());
             processException(e.getCause(), model);
         }
     }
@@ -84,5 +114,17 @@ public class OutboxService {
             default -> model.setDead(OutboxModel.ErrorCode.UNKNOWN_PROCESSING_FAILURE, cause.getMessage());
         }
         outboxRepository.save(model);
+    }
+
+    private boolean isRetriable(Throwable e) {
+        Throwable current = e;
+        while (current != null) {
+            if (current instanceof UnknownTopicOrPartitionException) return false;
+            if (current instanceof RetriableException) return true;
+            Throwable cause = current.getCause();
+            if (cause == current) break;
+            current = cause;
+        }
+        return false;
     }
 }
