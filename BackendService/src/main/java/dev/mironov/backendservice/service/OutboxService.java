@@ -41,17 +41,10 @@ public class OutboxService {
             log.error("[ALERT]: RETRY messages limit exceed {}", limit);
     }
 
-    public void processStuckProcessingTasks() {
-        List<OutboxModel> stucked = outboxRepository.findAllByProcessingUntilBefore(Instant.now());
-        for (OutboxModel model : stucked) {
-            model.setRetry(OutboxModel.ErrorCode.UNKNOWN_PROCESSING_FAILURE, "Unknown error happened: message stuck while processing");
-        }
-    }
-
     public void purgeExpiredTasks() {
         int deadRows, sentRows;
         do {
-            deadRows = outboxRepository.deleteAllExpiredByStatus(OutboxModel.Status.DEAD, 900, 10);
+            deadRows = outboxRepository.deleteAllExpiredByStatus(OutboxModel.Status.DEAD, 1800, 10);
             sentRows = outboxRepository.deleteAllExpiredByStatus(OutboxModel.Status.SENT, 900, 10);
         } while ((deadRows & sentRows) == 0);
     }
@@ -62,12 +55,20 @@ public class OutboxService {
     }
 
     @Transactional
-    public void processAll(List<OutboxModel> batch) {
-        batch.forEach(this::process);
+    public void processStuckProcessingTasks() {
+        List<OutboxModel> stucked = outboxRepository.findAllByProcessingUntilBefore(Instant.now());
+        for (OutboxModel model : stucked) {
+            model.setRetry(OutboxModel.ErrorCode.UNKNOWN_PROCESSING_FAILURE, "Unknown error happened: message stuck while processing");
+            outboxRepository.save(model);
+        }
     }
 
     @Transactional
-    public List<OutboxModel> processBatch() {
+    public void processAll() {
+        processBatch().forEach(this::process);
+    }
+
+    private List<OutboxModel> processBatch() {
         List<OutboxModel> batch = outboxRepository.findTop10ByStatusOrStatus(OutboxModel.Status.PENDING, OutboxModel.Status.RETRY);
         batch.forEach(OutboxModel::setProcessing);
         batch.removeIf(model -> model.getStatus() == OutboxModel.Status.RETRY);
@@ -81,6 +82,7 @@ public class OutboxService {
                 .setHeader(KafkaHeaders.TOPIC, "EMAIL_SENDING_TASKS")
                 .setHeader(KafkaCustomHeaders.EVENT_TYPE, model.getEventType())
                 .setHeader(KafkaCustomHeaders.SOURCE, model.getSource())
+                .setHeader(KafkaHeaders.KEY, model.getId())
                 .build();
         try {
             kafkaProducer.sendEvent(message);
