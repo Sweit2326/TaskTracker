@@ -11,7 +11,19 @@ public class OutboxScheduler {
     private final OutboxService outboxService;
 
     @Scheduled(fixedDelay = 10_000)
-    public void run() {
-        outboxService.processAll(outboxService.processBatch());
+    public void processTasks() {
+        outboxService.processAll();
+        outboxService.processStuckProcessingTasks();
+    }
+
+    @Scheduled(fixedDelay = 60_000)
+    public void checkLimitExceed() {
+        outboxService.checkDeadLimitExceed(10);
+        outboxService.checkRetryLimitExceed(15);
+    }
+
+    @Scheduled(fixedDelay = 600_000)
+    public void purgeExpired() {
+        outboxService.purgeExpiredTasks();
     }
 }
