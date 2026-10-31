@@ -6,15 +6,22 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.UUID;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class TestUserFactory {
+public class TestDataFactory {
     private final UserRepository repository;
     private final PasswordEncoder encoder;
 
-    public UserModel createUser() {
-        return repository.save(new UserModel(UUID.randomUUID()+"@test.com", encoder.encode("test")));
+    public static String generateTooLongRequest() {
+        return new Random().ints(256, 'a', 'z' + 1)
+                .mapToObj(i -> String.valueOf((char) i))
+                .collect(Collectors.joining());
+    }
+
+    public void createUser(String email, String password) {
+        repository.save(new UserModel(email, encoder.encode(password)));
     }
 }
