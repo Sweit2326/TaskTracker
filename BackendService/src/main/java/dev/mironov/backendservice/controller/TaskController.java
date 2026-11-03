@@ -1,11 +1,13 @@
 package dev.mironov.backendservice.controller;
 
-import dev.mironov.backendservice.record.TaskRequest;
+import dev.mironov.backendservice.record.CreateTaskRequest;
 import dev.mironov.backendservice.record.TaskResponse;
+import dev.mironov.backendservice.record.UpdateTaskRequest;
 import dev.mironov.backendservice.security.SecurityUtil;
 import dev.mironov.backendservice.service.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -28,13 +30,13 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<TaskResponse> createTask(@Valid @RequestBody TaskRequest req) {
+    public ResponseEntity<TaskResponse> createTask(@Valid @RequestBody CreateTaskRequest req) {
         TaskResponse resp = taskService.create(securityUtil.getUserId(), req);
-        return ResponseEntity.ok(resp);
+        return ResponseEntity.status(HttpStatus.CREATED).body(resp);
     }
 
     @PatchMapping("/{uuid}")
-    public ResponseEntity<TaskResponse> updateTask(@PathVariable("uuid") UUID uuid, @Valid @RequestBody TaskRequest req) {
+    public ResponseEntity<TaskResponse> updateTask(@PathVariable("uuid") UUID uuid, @Valid @RequestBody UpdateTaskRequest req) {
         TaskResponse resp = taskService.update(securityUtil.getUserId(), uuid, req);
         return ResponseEntity.ok(resp);
     }
