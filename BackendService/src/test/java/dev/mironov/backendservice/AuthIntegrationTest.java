@@ -2,8 +2,8 @@ package dev.mironov.backendservice;
 
 import dev.mironov.backendservice.record.AccessRequest;
 import dev.mironov.backendservice.service.RegisterService;
-import dev.mironov.backendservice.util.TestDataFactory;
 import dev.mironov.backendservice.util.TestJwtFactory;
+import dev.mironov.backendservice.util.TestUserFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -33,7 +33,7 @@ public class AuthIntegrationTest {
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
     @Autowired private TestJwtFactory jwtFactory;
-    @Autowired private TestDataFactory userFactory;
+    @Autowired private TestUserFactory userFactory;
     @MockitoSpyBean private RegisterService registerService;
 
     private final AccessRequest testRequest = new AccessRequest("test@mail.com", "test");
