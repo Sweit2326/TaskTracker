@@ -2,10 +2,12 @@ package dev.mironov.backendservice;
 
 import dev.mironov.backendservice.record.AccessRequest;
 import dev.mironov.backendservice.service.RegisterService;
-import dev.mironov.backendservice.util.TestUserFactory;
+import dev.mironov.backendservice.util.TestDataFactory;
 import dev.mironov.backendservice.util.TestJwtFactory;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -25,12 +27,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = TestContainerConfig.class)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@ExtendWith(MockitoExtension.class)
 @Transactional
 public class AuthIntegrationTest {
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
     @Autowired private TestJwtFactory jwtFactory;
-    @Autowired private TestUserFactory userFactory;
+    @Autowired private TestDataFactory userFactory;
     @MockitoSpyBean private RegisterService registerService;
 
     private final AccessRequest testRequest = new AccessRequest("test@mail.com", "test");
