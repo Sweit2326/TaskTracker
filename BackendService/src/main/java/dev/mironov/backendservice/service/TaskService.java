@@ -4,8 +4,9 @@ package dev.mironov.backendservice.service;
 import dev.mironov.backendservice.exception.TaskNotFoundException;
 import dev.mironov.backendservice.model.TaskModel;
 import dev.mironov.backendservice.model.UserModel;
-import dev.mironov.backendservice.record.TaskRequest;
+import dev.mironov.backendservice.record.CreateTaskRequest;
 import dev.mironov.backendservice.record.TaskResponse;
+import dev.mironov.backendservice.record.UpdateTaskRequest;
 import dev.mironov.backendservice.repository.TaskRepository;
 import dev.mironov.backendservice.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -39,7 +40,7 @@ public class TaskService {
         return respTasks;
     }
 
-    public TaskResponse create(int ownerId, TaskRequest req) {
+    public TaskResponse create(int ownerId, CreateTaskRequest req) {
         UserModel userProxy = userRepository.getReferenceById(ownerId);
         TaskModel task = new TaskModel(req.title(), req.content(), userProxy);
 
@@ -52,7 +53,7 @@ public class TaskService {
                 task.getUuid());
     }
 
-    public TaskResponse update(int ownerId, UUID uuid, TaskRequest req) {
+    public TaskResponse update(int ownerId, UUID uuid, UpdateTaskRequest req) {
         if (taskRepository.existsByUuidAndUser_Id(uuid, ownerId)) {
             TaskModel task = taskRepository.getTaskModelByUuid(uuid);
             task.setTitle(req.title());
