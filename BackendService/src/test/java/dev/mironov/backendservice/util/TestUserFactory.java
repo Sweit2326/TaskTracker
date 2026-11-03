@@ -7,11 +7,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Random;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class TestDataFactory {
+public class TestUserFactory {
     private final UserRepository repository;
     private final PasswordEncoder encoder;
 
@@ -23,5 +24,9 @@ public class TestDataFactory {
 
     public void createUser(String email, String password) {
         repository.save(new UserModel(email, encoder.encode(password)));
+    }
+
+    public UserModel createRandomUser() {
+        return repository.save(new UserModel(UUID.randomUUID()+"@mail.com", encoder.encode("password")));
     }
 }
