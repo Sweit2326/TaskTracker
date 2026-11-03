@@ -22,11 +22,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest(classes = BackendTestConfiguration.class)
+@SpringBootTest(classes = TestContainerConfig.class)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
-public class AuthenticationTest {
+public class AuthIntegrationTest {
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
     @Autowired private TestJwtFactory jwtFactory;

@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.testcontainers.mariadb.MariaDBContainer;
 
 @TestConfiguration
-class BackendTestConfiguration {
+class TestContainerConfig {
     @Bean
     @ServiceConnection
     public MariaDBContainer mariaDBContainer() {

@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WithMockUser
 @WebMvcTest(AuthController.class)
-public class AuthValidationTest {
+public class AuthControllerUnitTest {
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
     @MockitoBean private RegisterService registerService;

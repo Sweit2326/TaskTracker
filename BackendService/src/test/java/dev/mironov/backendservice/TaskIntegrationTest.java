@@ -28,12 +28,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(classes = BackendTestConfiguration.class)
+@SpringBootTest(classes = TestContainerConfig.class)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
 @WithMockUser
-public class TaskCrudTest {
+public class TaskIntegrationTest {
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
     @Autowired private TestUserFactory userFactory;
