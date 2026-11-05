@@ -10,6 +10,7 @@
 
     <modules>
         <module>backend-service</module>
+        <module>mail-service</module>
         <module>core</module>
     </modules>
 
