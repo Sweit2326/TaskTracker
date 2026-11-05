@@ -9,8 +9,8 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>BackendService</module>
-        <module>CoreService</module>
+        <module>backend-service</module>
+        <module>core</module>
     </modules>
 
     <properties>
@@ -46,7 +46,7 @@
             </dependency>
             <dependency>
                 <groupId>dev.mironov</groupId>
-                <artifactId>CoreService</artifactId>
+                <artifactId>core</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>
