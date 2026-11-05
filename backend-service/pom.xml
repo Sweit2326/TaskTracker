@@ -10,7 +10,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>BackendService</artifactId>
+    <artifactId>backend-service</artifactId>
 
     <dependencies>
         <dependency>
@@ -110,7 +110,7 @@
         </dependency>
         <dependency>
             <groupId>dev.mironov</groupId>
-            <artifactId>CoreService</artifactId>
+            <artifactId>core</artifactId>
         </dependency>
     </dependencies>
 
